@@ -10,20 +10,45 @@ swagger = Swagger(app)
 @app.route('/')
 def index():
     """Endpoint returning a blank index file
-    """
-    return "index"
+    ---
+    responses:
+     200:
+       description: The index of app
+   """
 
-@app.route('/hello')
-def hello():
+
+    return ("index")
+
+@app.route('/hello/<hello>')
+def hello(hello = None):
     """Endpoint returning a blank index file
+    ---
+     parameters:
+     - name: hello
+       in: path
+       type: string
+       required: false
+       default: World!
+       responses:
+        200:
+       description: A Hello World message
+
     """
-    return "Hello world!"
+
+    print(hello)
+    return ("Hello"+ hello)
 
 @app.route('/healthcheck')
 def healthcheck():
     """Endpoint returning a blank index file
+    ---
+    responses:
+      200:
+       description: A healthcheck 
+
     """
-    return "healthcheck"
+
+    return ("healthcheck")
 
 @app.route('/user/id/temp')
 def getUser():
@@ -51,17 +76,33 @@ def userSettings(userid=None):
     responseJSON = jsonify(response)
     return responseJSON
 
-@app.route('/search/lat/lon')
-def search():
+@app.route('/search/<lat>/<lon>')
+def search(lat = None, lon = None):
     """Endpoint returning a blank index file
+    ---
+    parameters:
+     - name: lat
+       in: path
+       type: string
+       required: true
+       default: None
+     - name: lon
+       in: path
+       type: string
+       required: true
+       default: None
+    responses:
+     200:
+       description: The latitude and longitude"
+
     """
-    return "/search/lat/lon"
+    return ("search:"+ lat + "," + lon)
 
 @app.route('/place/lat/lon')
 def place():
     """Endpoint returning a blank index file
     """
-    return "/place/lat/lon"
+    return "place/lat/lon"
 
 @app.route('/collect/<userid>/<itemid>')
 def collect(userid=None, itemid=None):
