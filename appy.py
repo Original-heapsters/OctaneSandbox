@@ -31,11 +31,25 @@ def getUser():
     """
     return "user/id/temp"
 
-@app.route('/user/settings/id/temp')
-def userSettings():
-    """Endpoint returning a blank index file
+@app.route('/user/settings/<userid>')
+def userSettings(userid=None):
     """
-    return "/user/settings/id/temp"
+        This is the endpoint to handle user settings configuration
+    ---
+    parameters:
+      - in: path
+        name: userid
+        type: string
+    responses:
+      200:
+        description: User settings updated
+    """
+    response = {}
+    response["status"] = 200
+    response["body"] = " User settings updated for UserID :" + userid
+    response["userid"] = userid
+    responseJSON = jsonify(response)
+    return responseJSON
 
 @app.route('/search/lat/lon')
 def search():
