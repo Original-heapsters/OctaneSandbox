@@ -2,11 +2,22 @@ import os
 from flask import Flask, render_template, json, jsonify, request, url_for, send_from_directory
 from werkzeug.utils import secure_filename
 from flasgger import Swagger
+import oktaTest
+
+cwd = os.path.dirname(os.path.realpath(__file__))
+app = Flask(__name__,
+            static_folder='dist',
+            static_url_path='/assets',
+            template_folder='{}/tools/templates'.format(cwd))
+app.secret_key = 'SECRET KEY THAT YOU **MUST** CHANGE ON PRODUCTION SYSTEMS!'
+allowed_issuers = []
+
+public_key_cache = {}
 
 
-app = Flask(__name__)
 swagger = Swagger(app)
-
+okta = oktaTest.oktaTest()
+okta.setup( pathToConfig = "Sample.okta.json")
 @app.route('/')
 def index():
     """Endpoint returning a blank index file
@@ -127,6 +138,55 @@ def collect(userid=None, itemid=None):
     response["itemid"] = itemid
     responseJSON = jsonify(response)
     return responseJSON
+
+#Review after Okta is setup    
+@app.route("/authorization-code/login-redirect")
+def auth_login_redirect():
+    return "redirect"
+    
+@app.route("/authorization-code/login-custom")
+def auth_login_custom():
+    return ("Log in")
+
+@app.route("/authorization-code/logout")
+def auth_logout():
+    session.clear()
+    response = {}
+    response["status"] = 200
+    response["body"] = "Successfully loged out"
+    responseJSON = jsonify(response)
+    return responseJSON
+
+ 
+#Will be in another clasee, db related   
+@app.route("/authorization-code/profile")
+def auth_profile():
+    if 'user' not in session:
+        return redirect(url_for('index'))
+    response = {}
+    response["status"] = 200
+    response["body"] = "Fetched user"
+    response["user"] = session['user']
+    responseJSON = jsonify(response)
+    return (responseJSON)
+
+@app.route("/authorization-code/callback")
+def auth_callback():
+    (data, statusCode) = okta.auth_callback(request)
+    if statusCode != 200:
+        response = {}
+        response["status"] = statusCode
+        response["body"] = data
+        responseJSON = jsonify(response)
+        return responseJSON
+
+    session["user"] = data
+    response = {}
+    response["status"] = statusCode
+    response["body"] = "Callback success"
+    responseJSON = jsonify(response)
+    return responseJSON
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
