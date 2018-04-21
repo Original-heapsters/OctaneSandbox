@@ -49,11 +49,29 @@ def place():
     """
     return "/place/lat/lon"
 
-@app.route('/collect/item/id')
-def collect():
-    """Endpoint returning a blank index file
+@app.route('/collect/<userid>/<itemid>')
+def collect(userid=None, itemid=None):
     """
-    return "/collect/item/id"
+        This is the endpoint to handle adding an item to a users collection
+    ---
+    parameters:
+      - in: path
+        name: userid
+        type: string
+      - in: path
+        name: itemid
+        type: string
+    responses:
+      200:
+        description: The task has been created
+    """
+    response = {}
+    response["status"] = 200
+    response["body"] = "UserID :" + userid + " ItemID : " + itemid
+    response["userid"] = userid
+    response["itemid"] = itemid
+    responseJSON = jsonify(response)
+    return responseJSON
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
